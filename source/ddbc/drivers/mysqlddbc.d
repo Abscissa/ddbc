@@ -196,7 +196,7 @@ public:
             conn = new mysql.connection.Connection(hostname, username, password, dbName, cast(ushort)port);
             closed = false;
             setAutoCommit(true);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             //writeln(e.msg);
             throw new SQLException(e);
         }
@@ -213,7 +213,7 @@ public:
 
             conn.close();
             closed = true;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -227,7 +227,7 @@ public:
             Statement stmt = createStatement();
             scope(exit) stmt.close();
             stmt.executeUpdate("COMMIT");
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -241,7 +241,7 @@ public:
             MySQLStatement stmt = new MySQLStatement(this);
     		activeStatements ~= stmt;
             return stmt;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -256,7 +256,7 @@ public:
             MySQLPreparedStatement stmt = new MySQLPreparedStatement(this, sql);
             activeStatements ~= stmt;
             return stmt;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e.msg ~ " while execution of query " ~ sql);
         }
     }
@@ -277,7 +277,7 @@ public:
         try {
             conn.selectDB(catalog);
             dbName = catalog;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -296,7 +296,7 @@ public:
             Statement stmt = createStatement();
             scope(exit) stmt.close();
             stmt.executeUpdate("ROLLBACK");
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -315,7 +315,7 @@ public:
             scope(exit) stmt.close();
             stmt.executeUpdate("SET autocommit=" ~ (autoCommit ? "1" : "0"));
             this.autocommit = autoCommit;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -392,7 +392,7 @@ public:
 	        rs = cmd.execSQLResult();
     	    resultSet = new MySQLResultSet(this, rs, createMetadata(cmd.resultFieldDescriptions));
         	return resultSet;
-		} catch (Throwable e) {
+		} catch (Exception e) {
             throw new SQLException(e.msg ~ " - while execution of query " ~ query);
         }
 	}
@@ -405,7 +405,7 @@ public:
 	        cmd = new Command(conn.getConnection(), query);
 			cmd.execSQL(rowsAffected);
 	        return cast(int)rowsAffected;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			throw new SQLException(e.msg ~ " - while execution of query " ~ query);
 		}
     }
@@ -419,7 +419,7 @@ public:
     		cmd.execSQL(rowsAffected);
     		insertId = Variant(cmd.lastInsertID);
     		return cast(int)rowsAffected;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e.msg ~ " - while execution of query " ~ query);
         }
 	}
@@ -430,7 +430,7 @@ public:
         try {
             closeResultSet();
             closed = true;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -460,7 +460,7 @@ class MySQLPreparedStatement : MySQLStatement, PreparedStatement {
             cmd = new Command(conn.getConnection(), query);
             cmd.prepare();
             paramCount = cmd.numParams;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -483,7 +483,7 @@ public:
             if (metadata is null)
                 metadata = createMetadata(cmd.preparedFieldDescriptions);
             return metadata;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -497,7 +497,7 @@ public:
             if (paramMetadata is null)
                 paramMetadata = createMetadata(cmd.preparedParamDescriptions);
             return paramMetadata;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -510,7 +510,7 @@ public:
             ulong rowsAffected = 0;
             cmd.execPrepared(rowsAffected);
             return cast(int)rowsAffected;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -524,7 +524,7 @@ public:
     		cmd.execPrepared(rowsAffected);
     		insertId = cmd.lastInsertID;
     		return cast(int)rowsAffected;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
 	}
@@ -537,7 +537,7 @@ public:
             rs = cmd.execPreparedResult();
             resultSet = new MySQLResultSet(this, rs, getMetaData());
             return resultSet;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -549,7 +549,7 @@ public:
         try {
             for (int i = 1; i <= paramCount; i++)
                 setNull(i);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -561,7 +561,7 @@ public:
         checkIndex(parameterIndex);
         try {
     		cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
 	}
@@ -572,7 +572,7 @@ public:
         checkIndex(parameterIndex);
         try {
     		cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
 	}
@@ -583,7 +583,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -594,7 +594,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -605,7 +605,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -616,7 +616,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -627,7 +627,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -638,7 +638,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -649,7 +649,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -660,7 +660,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -671,7 +671,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -685,7 +685,7 @@ public:
                 setNull(parameterIndex);
             else
                 cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -699,7 +699,7 @@ public:
                 setNull(parameterIndex);
             else
                 cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -713,7 +713,7 @@ public:
                 setNull(parameterIndex);
             else
                 cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -724,7 +724,7 @@ public:
 		checkIndex(parameterIndex);
         try {
 		    cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
 	}
@@ -735,7 +735,7 @@ public:
 		checkIndex(parameterIndex);
         try {
     		cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
 	}
@@ -746,7 +746,7 @@ public:
 		checkIndex(parameterIndex);
         try {
 		    cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
 	}
@@ -760,7 +760,7 @@ public:
                 setNull(parameterIndex);
             else
                 cmd.param(parameterIndex-1) = x;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -771,7 +771,7 @@ public:
         checkIndex(parameterIndex);
         try {
             cmd.setNullParam(parameterIndex-1);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -781,7 +781,7 @@ public:
         scope(exit) unlock();
         try {
             setNull(parameterIndex);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }
@@ -835,7 +835,7 @@ public:
 			foreach(key, val; rs.colNameIndicies)
 				columnMap[key] = cast(int)val;
     		columnCount = cast(int)rs.colNames.length;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new SQLException(e);
         }
     }

@@ -114,7 +114,7 @@ public:
             //writeln("getConnection(): creating new connection");
             try {
                 conn = super.getConnection();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 //writeln("exception while creating connection " ~ e.msg);
                 throw e;
             }

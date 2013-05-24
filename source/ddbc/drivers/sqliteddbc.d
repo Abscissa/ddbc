@@ -825,7 +825,7 @@ version(USE_SQLITE) {
                 return dt;
             try {
                 return DateTime.fromISOString(s);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 throw new SQLException("Cannot convert string to DateTime - " ~ s);
             }
         }
@@ -836,7 +836,7 @@ version(USE_SQLITE) {
                 return dt;
             try {
                 return Date.fromISOString(s);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 throw new SQLException("Cannot convert string to DateTime - " ~ s);
             }
         }
@@ -847,7 +847,7 @@ version(USE_SQLITE) {
                 return dt;
             try {
                 return TimeOfDay.fromISOString(s);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 throw new SQLException("Cannot convert string to DateTime - " ~ s);
             }
         }
