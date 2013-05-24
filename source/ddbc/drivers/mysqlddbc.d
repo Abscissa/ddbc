@@ -71,36 +71,36 @@ version(unittest) {
 }
 
 SqlType fromMySQLType(int t) {
-	switch(t) {
-	case SQLType.DECIMAL:
-		case SQLType.TINY: return SqlType.TINYINT;
-		case SQLType.SHORT: return SqlType.SMALLINT;
-		case SQLType.INT: return SqlType.INTEGER;
-		case SQLType.FLOAT: return SqlType.FLOAT;
-		case SQLType.DOUBLE: return SqlType.DOUBLE;
-		case SQLType.NULL: return SqlType.NULL;
-		case SQLType.TIMESTAMP: return SqlType.DATETIME;
-		case SQLType.LONGLONG: return SqlType.BIGINT;
-		case SQLType.INT24: return SqlType.INTEGER;
-		case SQLType.DATE: return SqlType.DATE;
-		case SQLType.TIME: return SqlType.TIME;
-		case SQLType.DATETIME: return SqlType.DATETIME;
-		case SQLType.YEAR: return SqlType.SMALLINT;
-		case SQLType.NEWDATE: return SqlType.DATE;
-		case SQLType.VARCHAR: return SqlType.VARCHAR;
-		case SQLType.BIT: return SqlType.BIT;
-		case SQLType.NEWDECIMAL: return SqlType.DECIMAL;
-		case SQLType.ENUM: return SqlType.OTHER;
-		case SQLType.SET: return SqlType.OTHER;
-		case SQLType.TINYBLOB: return SqlType.BLOB;
-		case SQLType.MEDIUMBLOB: return SqlType.BLOB;
-		case SQLType.LONGBLOB: return SqlType.BLOB;
-		case SQLType.BLOB: return SqlType.BLOB;
-		case SQLType.VARSTRING: return SqlType.VARCHAR;
-		case SQLType.STRING: return SqlType.VARCHAR;
-		case SQLType.GEOMETRY: return SqlType.OTHER;
-		default: return SqlType.OTHER;
-	}
+    switch(t) {
+    case SQLType.DECIMAL:
+        case SQLType.TINY: return SqlType.TINYINT;
+        case SQLType.SHORT: return SqlType.SMALLINT;
+        case SQLType.INT: return SqlType.INTEGER;
+        case SQLType.FLOAT: return SqlType.FLOAT;
+        case SQLType.DOUBLE: return SqlType.DOUBLE;
+        case SQLType.NULL: return SqlType.NULL;
+        case SQLType.TIMESTAMP: return SqlType.DATETIME;
+        case SQLType.LONGLONG: return SqlType.BIGINT;
+        case SQLType.INT24: return SqlType.INTEGER;
+        case SQLType.DATE: return SqlType.DATE;
+        case SQLType.TIME: return SqlType.TIME;
+        case SQLType.DATETIME: return SqlType.DATETIME;
+        case SQLType.YEAR: return SqlType.SMALLINT;
+        case SQLType.NEWDATE: return SqlType.DATE;
+        case SQLType.VARCHAR: return SqlType.VARCHAR;
+        case SQLType.BIT: return SqlType.BIT;
+        case SQLType.NEWDECIMAL: return SqlType.DECIMAL;
+        case SQLType.ENUM: return SqlType.OTHER;
+        case SQLType.SET: return SqlType.OTHER;
+        case SQLType.TINYBLOB: return SqlType.BLOB;
+        case SQLType.MEDIUMBLOB: return SqlType.BLOB;
+        case SQLType.LONGBLOB: return SqlType.BLOB;
+        case SQLType.BLOB: return SqlType.BLOB;
+        case SQLType.VARSTRING: return SqlType.VARCHAR;
+        case SQLType.STRING: return SqlType.VARCHAR;
+        case SQLType.GEOMETRY: return SqlType.OTHER;
+        default: return SqlType.OTHER;
+    }
 }
 
 class MySQLConnection : ddbc.core.Connection {
@@ -118,19 +118,19 @@ private:
     Mutex mutex;
 
 
-	MySQLStatement [] activeStatements;
+    MySQLStatement [] activeStatements;
 
-	void closeUnclosedStatements() {
-		MySQLStatement [] list = activeStatements.dup;
-		foreach(stmt; list) {
-			stmt.close();
-		}
-	}
+    void closeUnclosedStatements() {
+        MySQLStatement [] list = activeStatements.dup;
+        foreach(stmt; list) {
+            stmt.close();
+        }
+    }
 
-	void checkClosed() {
-		if (closed)
-			throw new SQLException("Connection is already closed");
-	}
+    void checkClosed() {
+        if (closed)
+            throw new SQLException("Connection is already closed");
+    }
 
 public:
 
@@ -145,14 +145,14 @@ public:
     mysql.connection.Connection getConnection() { return conn; }
 
 
-	void onStatementClosed(MySQLStatement stmt) {
-		foreach(index, item; activeStatements) {
-			if (item == stmt) {
-				remove(activeStatements, index);
-				return;
-			}
-		}
-	}
+    void onStatementClosed(MySQLStatement stmt) {
+        foreach(index, item; activeStatements) {
+            if (item == stmt) {
+                remove(activeStatements, index);
+                return;
+            }
+        }
+    }
 
     this(string url, string[string] params) {
         //writeln("MySQLConnection() creating connection");
@@ -169,17 +169,17 @@ public:
                 // TODO: parse params
             }
             string dbName = "";
-    		ptrdiff_t firstSlashes = std.string.indexOf(url, "//");
-    		ptrdiff_t lastSlash = std.string.lastIndexOf(url, '/');
-    		ptrdiff_t hostNameStart = firstSlashes >= 0 ? firstSlashes + 2 : 0;
-    		ptrdiff_t hostNameEnd = lastSlash >=0 && lastSlash > firstSlashes + 1 ? lastSlash : url.length;
+            ptrdiff_t firstSlashes = std.string.indexOf(url, "//");
+            ptrdiff_t lastSlash = std.string.lastIndexOf(url, '/');
+            ptrdiff_t hostNameStart = firstSlashes >= 0 ? firstSlashes + 2 : 0;
+            ptrdiff_t hostNameEnd = lastSlash >=0 && lastSlash > firstSlashes + 1 ? lastSlash : url.length;
             if (hostNameEnd < url.length - 1) {
                 dbName = url[hostNameEnd + 1 .. $];
             }
             hostname = url[hostNameStart..hostNameEnd];
             if (hostname.length == 0)
                 hostname = "localhost";
-    		ptrdiff_t portDelimiter = std.string.indexOf(hostname, ":");
+            ptrdiff_t portDelimiter = std.string.indexOf(hostname, ":");
             if (portDelimiter >= 0) {
                 string portString = hostname[portDelimiter + 1 .. $];
                 hostname = hostname[0 .. portDelimiter];
@@ -204,7 +204,7 @@ public:
         //writeln("MySQLConnection() connection created");
     }
     override void close() {
-		checkClosed();
+        checkClosed();
 
         lock();
         scope(exit) unlock();
@@ -239,7 +239,7 @@ public:
 
         try {
             MySQLStatement stmt = new MySQLStatement(this);
-    		activeStatements ~= stmt;
+            activeStatements ~= stmt;
             return stmt;
         } catch (Exception e) {
             throw new SQLException(e);
@@ -326,7 +326,7 @@ private:
     MySQLConnection conn;
     Command * cmd;
     mysql.connection.ResultSet rs;
-	MySQLResultSet resultSet;
+    MySQLResultSet resultSet;
 
     bool closed;
 
@@ -358,7 +358,7 @@ public:
             item.scale = field.scale;
             item.isNullable = !field.notNull;
             item.isSigned = !field.unsigned;
-			item.type = fromMySQLType(field.type);
+            item.type = fromMySQLType(field.type);
             // TODO: fill more params
             res[i] = item;
         }
@@ -372,8 +372,8 @@ public:
             item.scale = field.scale;
             item.isNullable = !field.notNull;
             item.isSigned = !field.unsigned;
-			item.type = fromMySQLType(field.type);
-			// TODO: fill more params
+            item.type = fromMySQLType(field.type);
+            // TODO: fill more params
             res[i] = item;
         }
         return new ParameterMetaDataImpl(res);
@@ -387,43 +387,43 @@ public:
         checkClosed();
         lock();
         scope(exit) unlock();
-		try {
-			cmd = new Command(conn.getConnection(), query);
-	        rs = cmd.execSQLResult();
-    	    resultSet = new MySQLResultSet(this, rs, createMetadata(cmd.resultFieldDescriptions));
-        	return resultSet;
-		} catch (Exception e) {
+        try {
+            cmd = new Command(conn.getConnection(), query);
+            rs = cmd.execSQLResult();
+            resultSet = new MySQLResultSet(this, rs, createMetadata(cmd.resultFieldDescriptions));
+            return resultSet;
+        } catch (Exception e) {
             throw new SQLException(e.msg ~ " - while execution of query " ~ query);
         }
-	}
+    }
     override int executeUpdate(string query) {
         checkClosed();
         lock();
         scope(exit) unlock();
-		ulong rowsAffected = 0;
-		try {
-	        cmd = new Command(conn.getConnection(), query);
-			cmd.execSQL(rowsAffected);
-	        return cast(int)rowsAffected;
-		} catch (Exception e) {
-			throw new SQLException(e.msg ~ " - while execution of query " ~ query);
-		}
-    }
-	override int executeUpdate(string query, out Variant insertId) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
+        ulong rowsAffected = 0;
         try {
             cmd = new Command(conn.getConnection(), query);
-    		ulong rowsAffected = 0;
-    		cmd.execSQL(rowsAffected);
-    		insertId = Variant(cmd.lastInsertID);
-    		return cast(int)rowsAffected;
+            cmd.execSQL(rowsAffected);
+            return cast(int)rowsAffected;
         } catch (Exception e) {
             throw new SQLException(e.msg ~ " - while execution of query " ~ query);
         }
-	}
-	override void close() {
+    }
+    override int executeUpdate(string query, out Variant insertId) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        try {
+            cmd = new Command(conn.getConnection(), query);
+            ulong rowsAffected = 0;
+            cmd.execSQL(rowsAffected);
+            insertId = Variant(cmd.lastInsertID);
+            return cast(int)rowsAffected;
+        } catch (Exception e) {
+            throw new SQLException(e.msg ~ " - while execution of query " ~ query);
+        }
+    }
+    override void close() {
         checkClosed();
         lock();
         scope(exit) unlock();
@@ -441,10 +441,10 @@ public:
         cmd.releaseStatement();
         delete cmd;
         cmd = null;
-		if (resultSet !is null) {
-			resultSet.onStatementClosed();
-			resultSet = null;
-		}
+        if (resultSet !is null) {
+            resultSet.onStatementClosed();
+            resultSet = null;
+        }
     }
 }
 
@@ -515,19 +515,19 @@ public:
         }
     }
 
-	override int executeUpdate(out Variant insertId) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
+    override int executeUpdate(out Variant insertId) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
         try {
-    		ulong rowsAffected = 0;
-    		cmd.execPrepared(rowsAffected);
-    		insertId = cmd.lastInsertID;
-    		return cast(int)rowsAffected;
+            ulong rowsAffected = 0;
+            cmd.execPrepared(rowsAffected);
+            insertId = cmd.lastInsertID;
+            return cast(int)rowsAffected;
         } catch (Exception e) {
             throw new SQLException(e);
         }
-	}
+    }
 
     override ddbc.core.ResultSet executeQuery() {
         checkClosed();
@@ -554,29 +554,29 @@ public:
         }
     }
     
-	override void setFloat(int parameterIndex, float x) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
+    override void setFloat(int parameterIndex, float x) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
         checkIndex(parameterIndex);
         try {
-    		cmd.param(parameterIndex-1) = x;
+            cmd.param(parameterIndex-1) = x;
         } catch (Exception e) {
             throw new SQLException(e);
         }
-	}
-	override void setDouble(int parameterIndex, double x){
-		checkClosed();
-		lock();
-		scope(exit) unlock();
+    }
+    override void setDouble(int parameterIndex, double x){
+        checkClosed();
+        lock();
+        scope(exit) unlock();
         checkIndex(parameterIndex);
         try {
-    		cmd.param(parameterIndex-1) = x;
+            cmd.param(parameterIndex-1) = x;
         } catch (Exception e) {
             throw new SQLException(e);
         }
-	}
-	override void setBoolean(int parameterIndex, bool x) {
+    }
+    override void setBoolean(int parameterIndex, bool x) {
         checkClosed();
         lock();
         scope(exit) unlock();
@@ -717,40 +717,40 @@ public:
             throw new SQLException(e);
         }
     }
-	override void setDateTime(int parameterIndex, DateTime x) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
-		checkIndex(parameterIndex);
+    override void setDateTime(int parameterIndex, DateTime x) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        checkIndex(parameterIndex);
         try {
-		    cmd.param(parameterIndex-1) = x;
+            cmd.param(parameterIndex-1) = x;
         } catch (Exception e) {
             throw new SQLException(e);
         }
-	}
-	override void setDate(int parameterIndex, Date x) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
-		checkIndex(parameterIndex);
+    }
+    override void setDate(int parameterIndex, Date x) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        checkIndex(parameterIndex);
         try {
-    		cmd.param(parameterIndex-1) = x;
+            cmd.param(parameterIndex-1) = x;
         } catch (Exception e) {
             throw new SQLException(e);
         }
-	}
-	override void setTime(int parameterIndex, TimeOfDay x) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
-		checkIndex(parameterIndex);
+    }
+    override void setTime(int parameterIndex, TimeOfDay x) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        checkIndex(parameterIndex);
         try {
-		    cmd.param(parameterIndex-1) = x;
+            cmd.param(parameterIndex-1) = x;
         } catch (Exception e) {
             throw new SQLException(e);
         }
-	}
-	override void setVariant(int parameterIndex, Variant x) {
+    }
+    override void setVariant(int parameterIndex, Variant x) {
         checkClosed();
         lock();
         scope(exit) unlock();
@@ -799,20 +799,20 @@ class MySQLResultSet : ResultSetImpl {
     private int columnCount;
 
     Variant getValue(int columnIndex) {
-		checkClosed();
+        checkClosed();
         enforceEx!SQLException(columnIndex >= 1 && columnIndex <= columnCount, "Column index out of bounds: " ~ to!string(columnIndex));
         enforceEx!SQLException(currentRowIndex >= 0 && currentRowIndex < rowCount, "No current row in result set");
         lastIsNull = rs[currentRowIndex].isNull(columnIndex - 1);
-		Variant res;
-		if (!lastIsNull)
-		    res = rs[currentRowIndex][columnIndex - 1];
+        Variant res;
+        if (!lastIsNull)
+            res = rs[currentRowIndex][columnIndex - 1];
         return res;
     }
 
-	void checkClosed() {
-		if (closed)
-			throw new SQLException("Result set is already closed");
-	}
+    void checkClosed() {
+        if (closed)
+            throw new SQLException("Result set is already closed");
+    }
 
 public:
 
@@ -832,17 +832,17 @@ public:
             closed = false;
             rowCount = cast(int)rs.length;
             currentRowIndex = -1;
-			foreach(key, val; rs.colNameIndicies)
-				columnMap[key] = cast(int)val;
-    		columnCount = cast(int)rs.colNames.length;
+            foreach(key, val; rs.colNameIndicies)
+                columnMap[key] = cast(int)val;
+            columnCount = cast(int)rs.colNames.length;
         } catch (Exception e) {
             throw new SQLException(e);
         }
     }
 
-	void onStatementClosed() {
-		closed = true;
-	}
+    void onStatementClosed() {
+        closed = true;
+    }
     string decodeTextBlob(ubyte[] data) {
         char[] res = new char[data.length];
         foreach (i, ch; data) {
@@ -869,26 +869,26 @@ public:
        	closed = true;
     }
     override bool first() {
-		checkClosed();
+        checkClosed();
         lock();
         scope(exit) unlock();
         currentRowIndex = 0;
         return currentRowIndex >= 0 && currentRowIndex < rowCount;
     }
     override bool isFirst() {
-		checkClosed();
+        checkClosed();
         lock();
         scope(exit) unlock();
         return rowCount > 0 && currentRowIndex == 0;
     }
     override bool isLast() {
-		checkClosed();
+        checkClosed();
         lock();
         scope(exit) unlock();
         return rowCount > 0 && currentRowIndex == rowCount - 1;
     }
     override bool next() {
-		checkClosed();
+        checkClosed();
         lock();
         scope(exit) unlock();
         if (currentRowIndex + 1 >= rowCount)
@@ -898,7 +898,7 @@ public:
     }
     
     override int findColumn(string columnName) {
-		checkClosed();
+        checkClosed();
         lock();
         scope(exit) unlock();
         int * p = (columnName in columnMap);
@@ -1056,68 +1056,68 @@ public:
         }
         throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to byte[]");
     }
-	override ubyte[] getUbytes(int columnIndex) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
-		Variant v = getValue(columnIndex);
-		if (lastIsNull)
-			return null;
-		if (v.convertsTo!(ubyte[])) {
-			return v.get!(ubyte[]);
-		}
-		throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to ubyte[]");
-	}
-	override string getString(int columnIndex) {
+    override ubyte[] getUbytes(int columnIndex) {
         checkClosed();
         lock();
         scope(exit) unlock();
         Variant v = getValue(columnIndex);
         if (lastIsNull)
             return null;
-		if (v.convertsTo!(ubyte[])) {
-			// assume blob encoding is utf-8
-			// TODO: check field encoding
+        if (v.convertsTo!(ubyte[])) {
+            return v.get!(ubyte[]);
+        }
+        throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to ubyte[]");
+    }
+    override string getString(int columnIndex) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        Variant v = getValue(columnIndex);
+        if (lastIsNull)
+            return null;
+        if (v.convertsTo!(ubyte[])) {
+            // assume blob encoding is utf-8
+            // TODO: check field encoding
             return decodeTextBlob(v.get!(ubyte[]));
-		}
+        }
         return v.toString();
     }
-	override std.datetime.DateTime getDateTime(int columnIndex) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
-		Variant v = getValue(columnIndex);
-		if (lastIsNull)
-			return DateTime();
-		if (v.convertsTo!(DateTime)) {
-			return v.get!DateTime();
-		}
-		throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to DateTime");
-	}
-	override std.datetime.Date getDate(int columnIndex) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
-		Variant v = getValue(columnIndex);
-		if (lastIsNull)
-			return Date();
-		if (v.convertsTo!(Date)) {
-			return v.get!Date();
-		}
-		throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to Date");
-	}
-	override std.datetime.TimeOfDay getTime(int columnIndex) {
-		checkClosed();
-		lock();
-		scope(exit) unlock();
-		Variant v = getValue(columnIndex);
-		if (lastIsNull)
-			return TimeOfDay();
-		if (v.convertsTo!(TimeOfDay)) {
-			return v.get!TimeOfDay();
-		}
-		throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to TimeOfDay");
-	}
+    override std.datetime.DateTime getDateTime(int columnIndex) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        Variant v = getValue(columnIndex);
+        if (lastIsNull)
+            return DateTime();
+        if (v.convertsTo!(DateTime)) {
+            return v.get!DateTime();
+        }
+        throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to DateTime");
+    }
+    override std.datetime.Date getDate(int columnIndex) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        Variant v = getValue(columnIndex);
+        if (lastIsNull)
+            return Date();
+        if (v.convertsTo!(Date)) {
+            return v.get!Date();
+        }
+        throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to Date");
+    }
+    override std.datetime.TimeOfDay getTime(int columnIndex) {
+        checkClosed();
+        lock();
+        scope(exit) unlock();
+        Variant v = getValue(columnIndex);
+        if (lastIsNull)
+            return TimeOfDay();
+        if (v.convertsTo!(TimeOfDay)) {
+            return v.get!TimeOfDay();
+        }
+        throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to TimeOfDay");
+    }
 
     override Variant getVariant(int columnIndex) {
         checkClosed();
@@ -1179,11 +1179,11 @@ class MySQLDriver : Driver {
     public static string generateUrl(string host, ushort port, string dbname) {
         return "mysql://" ~ host ~ ":" ~ to!string(port) ~ "/" ~ dbname;
     }
-	public static string[string] setUserAndPassword(string username, string password) {
-		string[string] params;
+    public static string[string] setUserAndPassword(string username, string password) {
+        string[string] params;
         params["user"] = username;
         params["password"] = password;
-		return params;
+        return params;
     }
     override ddbc.core.Connection connect(string url, string[string] params) {
         //writeln("MySQLDriver.connect " ~ url);
@@ -1245,11 +1245,11 @@ unittest {
             //writeln("field2 = '" ~ rs.getString(2) ~ "'");
             //writeln("field3 = '" ~ rs.getString(3) ~ "'");
             //writeln("wasNull = " ~ to!string(rs.wasNull()));
-			if (id == 1) {
-				DateTime ts = rs.getDateTime(4);
-				assert(ts == DateTime(2013,02,02,12,30,25));
-			}
-			if (id == 4) {
+            if (id == 1) {
+                DateTime ts = rs.getDateTime(4);
+                assert(ts == DateTime(2013,02,02,12,30,25));
+            }
+            if (id == 4) {
                 assert(rs.getString(2) == "name4_x");
                 assert(rs.isNull(3));
             }
@@ -1266,7 +1266,7 @@ unittest {
         }
         
         PreparedStatement ps2 = conn.prepareStatement("SELECT id, name, comment FROM ddbct1 WHERE id >= ?");
-		scope(exit) ps2.close();
+        scope(exit) ps2.close();
         ps2.setLong(1, 3);
         rs = ps2.executeQuery();
         while (rs.next()) {
@@ -1274,23 +1274,23 @@ unittest {
             index++;
         }
 
-		// checking last insert ID for prepared statement
-		PreparedStatement ps3 = conn.prepareStatement("INSERT INTO ddbct1 (name) values ('New String 1')");
-		scope(exit) ps3.close();
-		Variant newId;
-		assert(ps3.executeUpdate(newId) == 1);
-		//writeln("Generated insert id = " ~ newId.toString());
-		assert(newId.get!ulong > 0);
+        // checking last insert ID for prepared statement
+        PreparedStatement ps3 = conn.prepareStatement("INSERT INTO ddbct1 (name) values ('New String 1')");
+        scope(exit) ps3.close();
+        Variant newId;
+        assert(ps3.executeUpdate(newId) == 1);
+        //writeln("Generated insert id = " ~ newId.toString());
+        assert(newId.get!ulong > 0);
 
-		// checking last insert ID for normal statement
-		Statement stmt4 = conn.createStatement();
-		scope(exit) stmt4.close();
-		Variant newId2;
-		assert(stmt.executeUpdate("INSERT INTO ddbct1 (name) values ('New String 2')", newId2) == 1);
-		//writeln("Generated insert id = " ~ newId2.toString());
-		assert(newId2.get!ulong > 0);
+        // checking last insert ID for normal statement
+        Statement stmt4 = conn.createStatement();
+        scope(exit) stmt4.close();
+        Variant newId2;
+        assert(stmt.executeUpdate("INSERT INTO ddbct1 (name) values ('New String 2')", newId2) == 1);
+        //writeln("Generated insert id = " ~ newId2.toString());
+        assert(newId2.get!ulong > 0);
 
-	}
+    }
 }
 
 } else { // version(USE_MYSQL)
