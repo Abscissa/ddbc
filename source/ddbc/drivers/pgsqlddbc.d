@@ -338,10 +338,10 @@ version(USE_PGSQL) {
             int rows = PQntuples(res);
             int fieldCount = PQnfields(res);
             int[] fmts = new int[fieldCount];
-            int[] types = new int[fieldCount];
+            ulong[] types = new ulong[fieldCount];
             for (int col = 0; col < fieldCount; col++) {
                 fmts[col] = PQfformat(res, col);
-                types[col] = cast(int)PQftype(res, col);
+                types[col] = PQftype(res, col);
             }
             for (int row = 0; row < rows; row++) {
                 Variant[] v = new Variant[fieldCount];
@@ -352,13 +352,13 @@ version(USE_PGSQL) {
                     } else {
                         int len = PQgetlength(res, row, col);
                         const char * value = PQgetvalue(res, row, col);
-                        int t = types[col];
+                        ulong t = types[col];
                         //writeln("[" ~ to!string(row) ~ "][" ~ to!string(col) ~ "] type = " ~ to!string(t) ~ " len = " ~ to!string(len));
                         if (fmts[col] == 0) {
                             // text
                             string s = copyCString(value, len);
                             //writeln("text: " ~ s);
-                            switch(t) {
+                            switch(cast(uint)t) {
                                 case INT4OID:
                                     v[col] = parse!int(s);
                                     break;
@@ -432,7 +432,7 @@ version(USE_PGSQL) {
             return copyCString(PQerrorMessage(conn.getConnection()));
         }
 
-        override int executeUpdate(string query) {
+        override ulong executeUpdate(string query) {
             Variant dummy;
             return executeUpdate(query, dummy);
         }
@@ -449,7 +449,7 @@ version(USE_PGSQL) {
             }
         }
 
-        override int executeUpdate(string query, out Variant insertId) {
+        override ulong executeUpdate(string query, out Variant insertId) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -464,7 +464,7 @@ version(USE_PGSQL) {
             readInsertId(res, insertId);
 //    		auto lastid = PQoidValue(res);
 //            writeln("lastId = " ~ to!string(lastid));
-            int affected = rowsAffected.length > 0 ? to!int(rowsAffected) : 0;
+            ulong affected = rowsAffected.length > 0 ? to!ulong(rowsAffected) : 0;
 //    		insertId = Variant(cast(long)lastid);
             return affected;
         }
@@ -557,7 +557,7 @@ version(USE_PGSQL) {
         string getError(PGresult * res) {
             return copyCString(PQresultErrorMessage(res));
         }
-        void checkIndex(int index) {
+        void checkIndex(size_t index) {
             if (index < 1 || index > paramCount)
                 throw new SQLException("Parameter index " ~ to!string(index) ~ " is out of range");
         }
@@ -565,7 +565,7 @@ version(USE_PGSQL) {
             foreach(i, b; paramIsSet)
                 enforceEx!SQLException(b, "Parameter " ~ to!string(i) ~ " is not set");
         }
-        void setParam(int index, string value) {
+        void setParam(size_t index, string value) {
             checkIndex(index);
             paramValue[index - 1] = value;
             paramIsSet[index - 1] = true;
@@ -581,7 +581,7 @@ version(USE_PGSQL) {
                     values[i] = null;
                 else
                     values[i] = toStringz(paramValue[i]);
-                lengths[i] = cast(int)paramValue[i].length;
+                lengths[i] = paramValue[i].length;
             }
 //            PGresult * res = PQexecPrepared(conn.getConnection(),
 //                                            toStringz(stmtName),
@@ -631,12 +631,12 @@ version(USE_PGSQL) {
             return paramMetadata;
         }
         
-        override int executeUpdate() {
+        override ulong executeUpdate() {
             Variant dummy;
             return executeUpdate(dummy);
         }
         
-        override int executeUpdate(out Variant insertId) {
+        override ulong executeUpdate(out Variant insertId) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -649,7 +649,7 @@ version(USE_PGSQL) {
             //auto lastid = PQoidValue(res);
             readInsertId(res, insertId);
             //writeln("lastId = " ~ to!string(lastid));
-            int affected = rowsAffected.length > 0 ? to!int(rowsAffected) : 0;
+            ulong affected = rowsAffected.length > 0 ? to!ulong(rowsAffected) : 0;
             //insertId = Variant(cast(long)lastid);
             return affected;
         }
@@ -677,74 +677,74 @@ version(USE_PGSQL) {
     //			setNull(i);
         }
         
-        override void setFloat(int parameterIndex, float x) {
+        override void setFloat(size_t parameterIndex, float x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
-        override void setDouble(int parameterIndex, double x){
+        override void setDouble(size_t parameterIndex, double x){
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
-        override void setBoolean(int parameterIndex, bool x) {
+        override void setBoolean(size_t parameterIndex, bool x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, x ? "true" : "false");
         }
-        override void setLong(int parameterIndex, long x) {
+        override void setLong(size_t parameterIndex, long x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
 
-        override void setUlong(int parameterIndex, ulong x) {
+        override void setUlong(size_t parameterIndex, ulong x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
 
-        override void setInt(int parameterIndex, int x) {
+        override void setInt(size_t parameterIndex, int x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
 
-        override void setUint(int parameterIndex, uint x) {
+        override void setUint(size_t parameterIndex, uint x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
 
-        override void setShort(int parameterIndex, short x) {
+        override void setShort(size_t parameterIndex, short x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
 
-        override void setUshort(int parameterIndex, ushort x) {
+        override void setUshort(size_t parameterIndex, ushort x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
   
-        override void setByte(int parameterIndex, byte x) {
+        override void setByte(size_t parameterIndex, byte x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, to!string(x));
         }
  
-        override void setUbyte(int parameterIndex, ubyte x) {
+        override void setUbyte(size_t parameterIndex, ubyte x) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -752,29 +752,29 @@ version(USE_PGSQL) {
             setParam(parameterIndex, to!string(x));
         }
    
-        override void setBytes(int parameterIndex, byte[] x) {
+        override void setBytes(size_t parameterIndex, byte[] x) {
             setString(parameterIndex, bytesToBytea(x));
         }
-        override void setUbytes(int parameterIndex, ubyte[] x) {
+        override void setUbytes(size_t parameterIndex, ubyte[] x) {
             setString(parameterIndex, ubytesToBytea(x));
         }
-        override void setString(int parameterIndex, string x) {
+        override void setString(size_t parameterIndex, string x) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, x);
         }
-        override void setDateTime(int parameterIndex, DateTime x) {
+        override void setDateTime(size_t parameterIndex, DateTime x) {
             setString(parameterIndex, x.toISOString());
         }
-        override void setDate(int parameterIndex, Date x) {
+        override void setDate(size_t parameterIndex, Date x) {
             setString(parameterIndex, x.toISOString());
         }
-        override void setTime(int parameterIndex, TimeOfDay x) {
+        override void setTime(size_t parameterIndex, TimeOfDay x) {
             setString(parameterIndex, x.toISOString());
         }
 
-        override void setVariant(int parameterIndex, Variant x) {
+        override void setVariant(size_t parameterIndex, Variant x) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -792,14 +792,14 @@ version(USE_PGSQL) {
                 setParam(parameterIndex, x.toString());
         }
 
-        override void setNull(int parameterIndex) {
+        override void setNull(size_t parameterIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
             setParam(parameterIndex, null);
         }
 
-        override void setNull(int parameterIndex, int sqlType) {
+        override void setNull(size_t parameterIndex, int sqlType) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -812,16 +812,16 @@ version(USE_PGSQL) {
         private Variant[][] data;
         ResultSetMetaData metadata;
         private bool closed;
-        private int currentRowIndex;
-        private int rowCount;
-        private int[string] columnMap;
+        private size_t currentRowIndex;
+        private size_t rowCount;
+        private size_t[string] columnMap;
         private bool lastIsNull;
-        private int columnCount;
+        private size_t columnCount;
         
-        Variant getValue(int columnIndex) {
+        Variant getValue(size_t columnIndex) {
             checkClosed();
             enforceEx!SQLException(columnIndex >= 1 && columnIndex <= columnCount, "Column index out of bounds: " ~ to!string(columnIndex));
-            enforceEx!SQLException(currentRowIndex >= 0 && currentRowIndex < rowCount, "No current row in result set");
+            enforceEx!SQLException(currentRowIndex < rowCount, "No current row in result set");
             Variant res = data[currentRowIndex][columnIndex - 1];
             lastIsNull = (res == null);
             return res;
@@ -847,8 +847,8 @@ version(USE_PGSQL) {
             this.data = data;
             this.metadata = metadata;
             closed = false;
-            rowCount = cast(int)data.length;
-            currentRowIndex = -1;
+            rowCount = data.length;
+            currentRowIndex = size_t.max;
             columnCount = metadata.getColumnCount();
             for (int i=0; i<columnCount; i++) {
                 columnMap[metadata.getColumnName(i + 1)] = i;
@@ -882,7 +882,7 @@ version(USE_PGSQL) {
             lock();
             scope(exit) unlock();
             currentRowIndex = 0;
-            return currentRowIndex >= 0 && currentRowIndex < rowCount;
+            return rowCount > 0;
         }
         override bool isFirst() {
             checkClosed();
@@ -906,17 +906,17 @@ version(USE_PGSQL) {
             return true;
         }
         
-        override int findColumn(string columnName) {
+        override size_t findColumn(string columnName) {
             checkClosed();
             lock();
             scope(exit) unlock();
-            int * p = (columnName in columnMap);
+            size_t * p = (columnName in columnMap);
             if (!p)
                 throw new SQLException("Column " ~ columnName ~ " not found");
             return *p + 1;
         }
         
-        override bool getBoolean(int columnIndex) {
+        override bool getBoolean(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -931,7 +931,7 @@ version(USE_PGSQL) {
                 return v.get!(long) != 0;
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to boolean");
         }
-        override ubyte getUbyte(int columnIndex) {
+        override ubyte getUbyte(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -944,7 +944,7 @@ version(USE_PGSQL) {
                 return to!ubyte(v.get!(long));
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to ubyte");
         }
-        override byte getByte(int columnIndex) {
+        override byte getByte(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -957,7 +957,7 @@ version(USE_PGSQL) {
                 return to!byte(v.get!(long));
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to byte");
         }
-        override short getShort(int columnIndex) {
+        override short getShort(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -970,7 +970,7 @@ version(USE_PGSQL) {
                 return to!short(v.get!(long));
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to short");
         }
-        override ushort getUshort(int columnIndex) {
+        override ushort getUshort(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -983,7 +983,7 @@ version(USE_PGSQL) {
                 return to!ushort(v.get!(long));
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to ushort");
         }
-        override int getInt(int columnIndex) {
+        override int getInt(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -996,7 +996,7 @@ version(USE_PGSQL) {
                 return to!int(v.get!(long));
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to int");
         }
-        override uint getUint(int columnIndex) {
+        override uint getUint(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1009,7 +1009,7 @@ version(USE_PGSQL) {
                 return to!uint(v.get!(ulong));
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to uint");
         }
-        override long getLong(int columnIndex) {
+        override long getLong(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1020,7 +1020,7 @@ version(USE_PGSQL) {
                 return v.get!(long);
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to long");
         }
-        override ulong getUlong(int columnIndex) {
+        override ulong getUlong(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1031,7 +1031,7 @@ version(USE_PGSQL) {
                 return v.get!(ulong);
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to ulong");
         }
-        override double getDouble(int columnIndex) {
+        override double getDouble(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1042,7 +1042,7 @@ version(USE_PGSQL) {
                 return v.get!(double);
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to double");
         }
-        override float getFloat(int columnIndex) {
+        override float getFloat(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1053,7 +1053,7 @@ version(USE_PGSQL) {
                 return v.get!(float);
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to float");
         }
-        override byte[] getBytes(int columnIndex) {
+        override byte[] getBytes(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1065,7 +1065,7 @@ version(USE_PGSQL) {
             }
             return byteaToBytes(v.toString());
         }
-        override ubyte[] getUbytes(int columnIndex) {
+        override ubyte[] getUbytes(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1077,7 +1077,7 @@ version(USE_PGSQL) {
             }
             return byteaToUbytes(v.toString());
         }
-        override string getString(int columnIndex) {
+        override string getString(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1091,7 +1091,7 @@ version(USE_PGSQL) {
 //    		}
             return v.toString();
         }
-        override std.datetime.DateTime getDateTime(int columnIndex) {
+        override std.datetime.DateTime getDateTime(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1103,7 +1103,7 @@ version(USE_PGSQL) {
             }
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to DateTime");
         }
-        override std.datetime.Date getDate(int columnIndex) {
+        override std.datetime.Date getDate(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1115,7 +1115,7 @@ version(USE_PGSQL) {
             }
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to Date");
         }
-        override std.datetime.TimeOfDay getTime(int columnIndex) {
+        override std.datetime.TimeOfDay getTime(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1128,7 +1128,7 @@ version(USE_PGSQL) {
             throw new SQLException("Cannot convert field " ~ to!string(columnIndex) ~ " to TimeOfDay");
         }
         
-        override Variant getVariant(int columnIndex) {
+        override Variant getVariant(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -1145,12 +1145,12 @@ version(USE_PGSQL) {
             scope(exit) unlock();
             return lastIsNull;
         }
-        override bool isNull(int columnIndex) {
+        override bool isNull(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
             enforceEx!SQLException(columnIndex >= 1 && columnIndex <= columnCount, "Column index out of bounds: " ~ to!string(columnIndex));
-            enforceEx!SQLException(currentRowIndex >= 0 && currentRowIndex < rowCount, "No current row in result set");
+            enforceEx!SQLException(currentRowIndex < rowCount, "No current row in result set");
             return data[currentRowIndex][columnIndex - 1] == null;
         }
         
@@ -1163,17 +1163,17 @@ version(USE_PGSQL) {
         }
         
         //Retrieves the current row number
-        override int getRow() {
+        override size_t getRow() {
             checkClosed();
             lock();
             scope(exit) unlock();
-            if (currentRowIndex <0 || currentRowIndex >= rowCount)
+            if (currentRowIndex >= rowCount)
                 return 0;
             return currentRowIndex + 1;
         }
         
         //Retrieves the fetch size for this ResultSet object.
-        override int getFetchSize() {
+        override size_t getFetchSize() {
             checkClosed();
             lock();
             scope(exit) unlock();

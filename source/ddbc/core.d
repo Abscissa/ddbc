@@ -152,116 +152,116 @@ interface Connection {
 
 interface ResultSetMetaData {
     //Returns the number of columns in this ResultSet object.
-    int getColumnCount();
+    size_t getColumnCount();
 
     // Gets the designated column's table's catalog name.
-    string getCatalogName(int column);
+    string getCatalogName(size_t column);
     // Returns the fully-qualified name of the Java class whose instances are manufactured if the method ResultSet.getObject is called to retrieve a value from the column.
     //string getColumnClassName(int column);
     // Indicates the designated column's normal maximum width in characters.
-    int getColumnDisplaySize(int column);
+    int getColumnDisplaySize(size_t column);
     // Gets the designated column's suggested title for use in printouts and displays.
-    string getColumnLabel(int column);
+    string getColumnLabel(size_t column);
     // Get the designated column's name.
-    string getColumnName(int column);
+    string getColumnName(size_t column);
     // Retrieves the designated column's SQL type.
-    int getColumnType(int column);
+    int getColumnType(size_t column);
     // Retrieves the designated column's database-specific type name.
-    string getColumnTypeName(int column);
+    string getColumnTypeName(size_t column);
     // Get the designated column's number of decimal digits.
-    int getPrecision(int column);
+    int getPrecision(size_t column);
     // Gets the designated column's number of digits to right of the decimal point.
-    int getScale(int column);
+    int getScale(size_t column);
     // Get the designated column's table's schema.
-    string getSchemaName(int column);
+    string getSchemaName(size_t column);
     // Gets the designated column's table name.
-    string getTableName(int column);
+    string getTableName(size_t column);
     // Indicates whether the designated column is automatically numbered, thus read-only.
-    bool isAutoIncrement(int column);
+    bool isAutoIncrement(size_t column);
     // Indicates whether a column's case matters.
-    bool isCaseSensitive(int column);
+    bool isCaseSensitive(size_t column);
     // Indicates whether the designated column is a cash value.
-    bool isCurrency(int column);
+    bool isCurrency(size_t column);
     // Indicates whether a write on the designated column will definitely succeed.
-    bool isDefinitelyWritable(int column);
+    bool isDefinitelyWritable(size_t column);
     // Indicates the nullability of values in the designated column.
-    int isNullable(int column);
+    int isNullable(size_t column);
     // Indicates whether the designated column is definitely not writable.
-    bool isReadOnly(int column);
+    bool isReadOnly(size_t column);
     // Indicates whether the designated column can be used in a where clause.
-    bool isSearchable(int column);
+    bool isSearchable(size_t column);
     // Indicates whether values in the designated column are signed numbers.
-    bool isSigned(int column);
+    bool isSigned(size_t column);
     // Indicates whether it is possible for a write on the designated column to succeed.
-    bool isWritable(int column);
+    bool isWritable(size_t column);
 }
 
 interface ParameterMetaData {
     // Retrieves the fully-qualified name of the Java class whose instances should be passed to the method PreparedStatement.setObject.
-    //String getParameterClassName(int param);
+    //String getParameterClassName(size_t param);
     /// Retrieves the number of parameters in the PreparedStatement object for which this ParameterMetaData object contains information.
-    int getParameterCount();
+    size_t getParameterCount();
     /// Retrieves the designated parameter's mode.
-    int getParameterMode(int param);
+    int getParameterMode(size_t param);
     /// Retrieves the designated parameter's SQL type.
-    int getParameterType(int param);
+    int getParameterType(size_t param);
     /// Retrieves the designated parameter's database-specific type name.
-    string getParameterTypeName(int param);
+    string getParameterTypeName(size_t param);
     /// Retrieves the designated parameter's number of decimal digits.
-    int getPrecision(int param);
+    int getPrecision(size_t param);
     /// Retrieves the designated parameter's number of digits to right of the decimal point.
-    int getScale(int param);
+    int getScale(size_t param);
     /// Retrieves whether null values are allowed in the designated parameter.
-    int isNullable(int param);
+    int isNullable(size_t param);
     /// Retrieves whether values for the designated parameter can be signed numbers.
-    bool isSigned(int param);
+    bool isSigned(size_t param);
 }
 
 interface DataSetReader {
-    bool getBoolean(int columnIndex);
-    ubyte getUbyte(int columnIndex);
-    ubyte[] getUbytes(int columnIndex);
-    byte[] getBytes(int columnIndex);
-    byte getByte(int columnIndex);
-    short getShort(int columnIndex);
-    ushort getUshort(int columnIndex);
-    int getInt(int columnIndex);
-    uint getUint(int columnIndex);
-    long getLong(int columnIndex);
-    ulong getUlong(int columnIndex);
-    double getDouble(int columnIndex);
-    float getFloat(int columnIndex);
-    string getString(int columnIndex);
-    DateTime getDateTime(int columnIndex);
-    Date getDate(int columnIndex);
-    TimeOfDay getTime(int columnIndex);
-    Variant getVariant(int columnIndex);
-    bool isNull(int columnIndex);
+    bool getBoolean(size_t columnIndex);
+    ubyte getUbyte(size_t columnIndex);
+    ubyte[] getUbytes(size_t columnIndex);
+    byte[] getBytes(size_t columnIndex);
+    byte getByte(size_t columnIndex);
+    short getShort(size_t columnIndex);
+    ushort getUshort(size_t columnIndex);
+    int getInt(size_t columnIndex);
+    uint getUint(size_t columnIndex);
+    long getLong(size_t columnIndex);
+    ulong getUlong(size_t columnIndex);
+    double getDouble(size_t columnIndex);
+    float getFloat(size_t columnIndex);
+    string getString(size_t columnIndex);
+    DateTime getDateTime(size_t columnIndex);
+    Date getDate(size_t columnIndex);
+    TimeOfDay getTime(size_t columnIndex);
+    Variant getVariant(size_t columnIndex);
+    bool isNull(size_t columnIndex);
     bool wasNull();
 }
 
 interface DataSetWriter {
-    void setFloat(int parameterIndex, float x);
-    void setDouble(int parameterIndex, double x);
-    void setBoolean(int parameterIndex, bool x);
-    void setLong(int parameterIndex, long x);
-    void setInt(int parameterIndex, int x);
-    void setShort(int parameterIndex, short x);
-    void setByte(int parameterIndex, byte x);
-    void setBytes(int parameterIndex, byte[] x);
-    void setUlong(int parameterIndex, ulong x);
-    void setUint(int parameterIndex, uint x);
-    void setUshort(int parameterIndex, ushort x);
-    void setUbyte(int parameterIndex, ubyte x);
-    void setUbytes(int parameterIndex, ubyte[] x);
-    void setString(int parameterIndex, string x);
-    void setDateTime(int parameterIndex, DateTime x);
-    void setDate(int parameterIndex, Date x);
-    void setTime(int parameterIndex, TimeOfDay x);
-    void setVariant(int columnIndex, Variant x);
+    void setFloat(size_t parameterIndex, float x);
+    void setDouble(size_t parameterIndex, double x);
+    void setBoolean(size_t parameterIndex, bool x);
+    void setLong(size_t parameterIndex, long x);
+    void setInt(size_t parameterIndex, int x);
+    void setShort(size_t parameterIndex, short x);
+    void setByte(size_t parameterIndex, byte x);
+    void setBytes(size_t parameterIndex, byte[] x);
+    void setUlong(size_t parameterIndex, ulong x);
+    void setUint(size_t parameterIndex, uint x);
+    void setUshort(size_t parameterIndex, ushort x);
+    void setUbyte(size_t parameterIndex, ubyte x);
+    void setUbytes(size_t parameterIndex, ubyte[] x);
+    void setString(size_t parameterIndex, string x);
+    void setDateTime(size_t parameterIndex, DateTime x);
+    void setDate(size_t parameterIndex, Date x);
+    void setTime(size_t parameterIndex, TimeOfDay x);
+    void setVariant(size_t columnIndex, Variant x);
 
-    void setNull(int parameterIndex);
-    void setNull(int parameterIndex, int sqlType);
+    void setNull(size_t parameterIndex);
+    void setNull(size_t parameterIndex, int sqlType);
 }
 
 interface ResultSet : DataSetReader {
@@ -276,32 +276,32 @@ interface ResultSet : DataSetReader {
     //Retrieves the Statement object that produced this ResultSet object.
     Statement getStatement();
     //Retrieves the current row number
-    int getRow();
+    size_t getRow();
     //Retrieves the fetch size for this ResultSet object.
-    int getFetchSize();
+    size_t getFetchSize();
 
     // from DataSetReader
-    bool getBoolean(int columnIndex);
-    ubyte getUbyte(int columnIndex);
-    ubyte[] getUbytes(int columnIndex);
-    byte[] getBytes(int columnIndex);
-    byte getByte(int columnIndex);
-    short getShort(int columnIndex);
-    ushort getUshort(int columnIndex);
-    int getInt(int columnIndex);
-    uint getUint(int columnIndex);
-    long getLong(int columnIndex);
-    ulong getUlong(int columnIndex);
-    double getDouble(int columnIndex);
-    float getFloat(int columnIndex);
-    string getString(int columnIndex);
-    Variant getVariant(int columnIndex);
+    bool getBoolean(size_t columnIndex);
+    ubyte getUbyte(size_t columnIndex);
+    ubyte[] getUbytes(size_t columnIndex);
+    byte[] getBytes(size_t columnIndex);
+    byte getByte(size_t columnIndex);
+    short getShort(size_t columnIndex);
+    ushort getUshort(size_t columnIndex);
+    int getInt(size_t columnIndex);
+    uint getUint(size_t columnIndex);
+    long getLong(size_t columnIndex);
+    ulong getUlong(size_t columnIndex);
+    double getDouble(size_t columnIndex);
+    float getFloat(size_t columnIndex);
+    string getString(size_t columnIndex);
+    Variant getVariant(size_t columnIndex);
 
-    bool isNull(int columnIndex);
+    bool isNull(size_t columnIndex);
     bool wasNull();
 
     // additional methods
-    int findColumn(string columnName);
+    size_t findColumn(string columnName);
     bool getBoolean(string columnName);
     ubyte getUbyte(string columnName);
     ubyte[] getUbytes(string columnName);
@@ -316,9 +316,9 @@ interface ResultSet : DataSetReader {
     double getDouble(string columnName);
     float getFloat(string columnName);
     string getString(string columnName);
-    DateTime getDateTime(int columnIndex);
-    Date getDate(int columnIndex);
-    TimeOfDay getTime(int columnIndex);
+    DateTime getDateTime(size_t columnIndex);
+    Date getDate(size_t columnIndex);
+    TimeOfDay getTime(size_t columnIndex);
     Variant getVariant(string columnName);
 
     /// to iterate through all rows in result set
@@ -328,17 +328,17 @@ interface ResultSet : DataSetReader {
 
 interface Statement {
     ResultSet executeQuery(string query);
-    int executeUpdate(string query);
-    int executeUpdate(string query, out Variant insertId);
+    ulong executeUpdate(string query);
+    ulong executeUpdate(string query, out Variant insertId);
     void close();
 }
 
 /// An object that represents a precompiled SQL statement. 
 interface PreparedStatement : Statement, DataSetWriter {
     /// Executes the SQL statement in this PreparedStatement object, which must be an SQL INSERT, UPDATE or DELETE statement; or an SQL statement that returns nothing, such as a DDL statement.
-    int executeUpdate();
+    ulong executeUpdate();
     /// Executes the SQL statement in this PreparedStatement object, which must be an SQL INSERT, UPDATE or DELETE statement; or an SQL statement that returns nothing, such as a DDL statement.
-    int executeUpdate(out Variant insertId);
+    ulong executeUpdate(out Variant insertId);
     /// Executes the SQL query in this PreparedStatement object and returns the ResultSet object generated by the query.
     ResultSet executeQuery();
 
@@ -350,27 +350,27 @@ interface PreparedStatement : Statement, DataSetWriter {
     void clearParameters();
 
     // from DataSetWriter
-    void setFloat(int parameterIndex, float x);
-    void setDouble(int parameterIndex, double x);
-    void setBoolean(int parameterIndex, bool x);
-    void setLong(int parameterIndex, long x);
-    void setInt(int parameterIndex, int x);
-    void setShort(int parameterIndex, short x);
-    void setByte(int parameterIndex, byte x);
-    void setBytes(int parameterIndex, byte[] x);
-    void setUlong(int parameterIndex, ulong x);
-    void setUint(int parameterIndex, uint x);
-    void setUshort(int parameterIndex, ushort x);
-    void setUbyte(int parameterIndex, ubyte x);
-    void setUbytes(int parameterIndex, ubyte[] x);
-    void setString(int parameterIndex, string x);
-    void setDateTime(int parameterIndex, DateTime x);
-    void setDate(int parameterIndex, Date x);
-    void setTime(int parameterIndex, TimeOfDay x);
-    void setVariant(int parameterIndex, Variant x);
+    void setFloat(size_t parameterIndex, float x);
+    void setDouble(size_t parameterIndex, double x);
+    void setBoolean(size_t parameterIndex, bool x);
+    void setLong(size_t parameterIndex, long x);
+    void setInt(size_t parameterIndex, int x);
+    void setShort(size_t parameterIndex, short x);
+    void setByte(size_t parameterIndex, byte x);
+    void setBytes(size_t parameterIndex, byte[] x);
+    void setUlong(size_t parameterIndex, ulong x);
+    void setUint(size_t parameterIndex, uint x);
+    void setUshort(size_t parameterIndex, ushort x);
+    void setUbyte(size_t parameterIndex, ubyte x);
+    void setUbytes(size_t parameterIndex, ubyte[] x);
+    void setString(size_t parameterIndex, string x);
+    void setDateTime(size_t parameterIndex, DateTime x);
+    void setDate(size_t parameterIndex, Date x);
+    void setTime(size_t parameterIndex, TimeOfDay x);
+    void setVariant(size_t parameterIndex, Variant x);
 
-    void setNull(int parameterIndex);
-    void setNull(int parameterIndex, int sqlType);
+    void setNull(size_t parameterIndex);
+    void setNull(size_t parameterIndex, int sqlType);
 }
 
 interface Driver {

@@ -280,12 +280,12 @@ version(USE_SQLITE) {
     //        return copyCString(PQerrorMessage(conn.getConnection()));
     //    }
         
-        override int executeUpdate(string query) {
+        override ulong executeUpdate(string query) {
             Variant dummy;
             return executeUpdate(query, dummy);
         }
         
-        override int executeUpdate(string query, out Variant insertId) {
+        override ulong executeUpdate(string query, out Variant insertId) {
             closePreparedStatement();
             _currentStatement = conn.prepareStatement(query);
             return _currentStatement.executeUpdate(insertId);
@@ -319,10 +319,10 @@ version(USE_SQLITE) {
             this.query = query;
 
             int res = sqlite3_prepare_v2(
-                conn.getConnection(),            /* Database handle */
+                conn.getConnection(),   /* Database handle */
                 toStringz(query),       /* SQL statement, UTF-8 encoded */
-                cast(int)query.length,              /* Maximum length of zSql in bytes. */
-                &stmt,  /* OUT: Statement handle */
+                to!int(query.length),   /* Maximum length of zSql in bytes. */
+                &stmt,   /* OUT: Statement handle */
                 null     /* OUT: Pointer to unused portion of zSql */
                 );
             enforceEx!SQLException(res == SQLITE_OK, "Error #" ~ to!string(res) ~ " while preparing statement " ~ query ~ " : " ~ conn.getError());
@@ -349,7 +349,7 @@ version(USE_SQLITE) {
             }
         }
         // before setting any parameter
-        private void checkIndex(int index) {
+        private void checkIndex(size_t index) {
             if (index < 1 || index > paramCount)
                 throw new SQLException("Parameter index " ~ to!string(index) ~ " is out of range");
             if (!preparing) {
@@ -358,7 +358,7 @@ version(USE_SQLITE) {
                 preparing = true;
             }
         }
-        ref Variant getParam(int index) {
+        ref Variant getParam(size_t index) {
             throw new SQLException("Not implemented");
             //      checkIndex(index);
             //      return cmd.param(cast(ushort)(index - 1));
@@ -431,14 +431,14 @@ version(USE_SQLITE) {
             return paramMetadata;
         }
 
-        override int executeUpdate(out Variant insertId) {
+        override ulong executeUpdate(out Variant insertId) {
             //throw new SQLException("Not implemented");
             checkClosed();
             lock();
             scope(exit) unlock();
             allParamsSet();
 
-            int rowsAffected = 0;
+            ulong rowsAffected = 0;
             int res = sqlite3_step(stmt);
             if (res == SQLITE_DONE) {
                 insertId = Variant(sqlite3_last_insert_rowid(conn.getConnection()));
@@ -446,14 +446,18 @@ version(USE_SQLITE) {
                 done = true;
             } else if (res == SQLITE_ROW) {
                 // row is available
-                rowsAffected = -1;
+				//
+				// Is there ever a need to distinguish this from when there is
+				// a SQLITE_DONE and no rows affected? DDBC and HibernateD
+				// never check for such a situation.
+                rowsAffected = 0;
             } else {
                 enforceEx!SQLException(false, "Error #" ~ to!string(res) ~ " while trying to execute prepared statement: "  ~ " : " ~ conn.getError());
             }
             return rowsAffected;
         }
         
-        override int executeUpdate() {
+        override ulong executeUpdate() {
             Variant insertId;
             return executeUpdate(insertId);
         }
@@ -473,14 +477,14 @@ version(USE_SQLITE) {
             //      checkClosed();
             //      lock();
             //      scope(exit) unlock();
-            //      for (int i = 1; i <= paramCount; i++)
+            //      for (size_t i = 1; i <= paramCount; i++)
             //          setNull(i);
         }
         
-        override void setFloat(int parameterIndex, float x) {
+        override void setFloat(size_t parameterIndex, float x) {
             setDouble(parameterIndex, x);
         }
-        override void setDouble(int parameterIndex, double x){
+        override void setDouble(size_t parameterIndex, double x){
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -488,10 +492,10 @@ version(USE_SQLITE) {
             sqlite3_bind_double(stmt, parameterIndex, x);
             paramIsSet[parameterIndex - 1] = true;
         }
-        override void setBoolean(int parameterIndex, bool x) {
+        override void setBoolean(size_t parameterIndex, bool x) {
             setLong(parameterIndex, x ? 1 : 0);
         }
-        override void setLong(int parameterIndex, long x) {
+        override void setLong(size_t parameterIndex, long x) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -499,28 +503,28 @@ version(USE_SQLITE) {
             sqlite3_bind_int64(stmt, parameterIndex, x);
             paramIsSet[parameterIndex - 1] = true;
         }
-        override void setUlong(int parameterIndex, ulong x) {
+        override void setUlong(size_t parameterIndex, ulong x) {
             setLong(parameterIndex, cast(long)x);
         }
-        override void setInt(int parameterIndex, int x) {
+        override void setInt(size_t parameterIndex, int x) {
             setLong(parameterIndex, cast(long)x);
         }
-        override void setUint(int parameterIndex, uint x) {
+        override void setUint(size_t parameterIndex, uint x) {
             setLong(parameterIndex, cast(long)x);
         }
-        override void setShort(int parameterIndex, short x) {
+        override void setShort(size_t parameterIndex, short x) {
             setLong(parameterIndex, cast(long)x);
         }
-        override void setUshort(int parameterIndex, ushort x) {
+        override void setUshort(size_t parameterIndex, ushort x) {
             setLong(parameterIndex, cast(long)x);
         }
-        override void setByte(int parameterIndex, byte x) {
+        override void setByte(size_t parameterIndex, byte x) {
             setLong(parameterIndex, cast(long)x);
         }
-        override void setUbyte(int parameterIndex, ubyte x) {
+        override void setUbyte(size_t parameterIndex, ubyte x) {
             setLong(parameterIndex, cast(long)x);
         }
-        override void setBytes(int parameterIndex, byte[] x) {
+        override void setBytes(size_t parameterIndex, byte[] x) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -529,10 +533,10 @@ version(USE_SQLITE) {
                 setNull(parameterIndex);
                 return;
             }
-            sqlite3_bind_blob(stmt, parameterIndex, cast(const (void *))x.ptr, cast(int)x.length, SQLITE_TRANSIENT);
+            sqlite3_bind_blob(stmt, parameterIndex, cast(const (void *))x.ptr, to!int(x.length), SQLITE_TRANSIENT);
             paramIsSet[parameterIndex - 1] = true;
         }
-        override void setUbytes(int parameterIndex, ubyte[] x) {
+        override void setUbytes(size_t parameterIndex, ubyte[] x) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -541,10 +545,10 @@ version(USE_SQLITE) {
                 setNull(parameterIndex);
                 return;
             }
-            sqlite3_bind_blob(stmt, parameterIndex, cast(const char *)x.ptr, cast(int)x.length, SQLITE_TRANSIENT);
+            sqlite3_bind_blob(stmt, parameterIndex, cast(const char *)x.ptr, to!int(x.length), SQLITE_TRANSIENT);
             paramIsSet[parameterIndex - 1] = true;
         }
-        override void setString(int parameterIndex, string x) {
+        override void setString(size_t parameterIndex, string x) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -553,19 +557,19 @@ version(USE_SQLITE) {
                 setNull(parameterIndex);
                 return;
             }
-            sqlite3_bind_text(stmt, parameterIndex, cast(const char *)x.ptr, cast(int)x.length, SQLITE_TRANSIENT);
+            sqlite3_bind_text(stmt, parameterIndex, cast(const char *)x.ptr, to!int(x.length), SQLITE_TRANSIENT);
             paramIsSet[parameterIndex - 1] = true;
         }
-        override void setDateTime(int parameterIndex, DateTime x) {
+        override void setDateTime(size_t parameterIndex, DateTime x) {
             setString(parameterIndex, x.toISOString());
         }
-        override void setDate(int parameterIndex, Date x) {
+        override void setDate(size_t parameterIndex, Date x) {
             setString(parameterIndex, x.toISOString());
         }
-        override void setTime(int parameterIndex, TimeOfDay x) {
+        override void setTime(size_t parameterIndex, TimeOfDay x) {
             setString(parameterIndex, x.toISOString());
         }
-        override void setVariant(int parameterIndex, Variant x) {
+        override void setVariant(size_t parameterIndex, Variant x) {
             if (x == null)
                 setNull(parameterIndex);
             else if (x.convertsTo!long)
@@ -587,7 +591,7 @@ version(USE_SQLITE) {
             else
                 setString(parameterIndex, x.toString());
         }
-        override void setNull(int parameterIndex) {
+        override void setNull(size_t parameterIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -595,7 +599,7 @@ version(USE_SQLITE) {
             sqlite3_bind_null(stmt, parameterIndex);
             paramIsSet[parameterIndex - 1] = true;
         }
-        override void setNull(int parameterIndex, int sqlType) {
+        override void setNull(size_t parameterIndex, int sqlType) {
             setNull(parameterIndex);
         }
     }
@@ -605,17 +609,18 @@ version(USE_SQLITE) {
         private sqlite3_stmt * rs;
         ResultSetMetaData metadata;
         private bool closed;
-        private int currentRowIndex;
-//        private int rowCount;
-        private int[string] columnMap;
+        private size_t currentRowIndex;
+		private bool started;
+//        private size_t rowCount;
+        private size_t[string] columnMap;
         private bool lastIsNull;
-        private int columnCount;
+        private size_t columnCount;
 
         private bool _last;
         private bool _first;
 
         // checks index, updates lastIsNull, returns column type
-        int checkIndex(int columnIndex) {
+        int checkIndex(size_t columnIndex) {
             enforceEx!SQLException(columnIndex >= 1 && columnIndex <= columnCount, "Column index out of bounds: " ~ to!string(columnIndex));
             int res = sqlite3_column_type(rs, columnIndex - 1);
             lastIsNull = (res == SQLITE_NULL);
@@ -646,7 +651,8 @@ version(USE_SQLITE) {
             for (int i=0; i<columnCount; i++) {
                 columnMap[metadata.getColumnName(i + 1)] = i;
             }
-            currentRowIndex = -1;
+			started = false;
+            currentRowIndex = 0;
             _first = true;
         }
         
@@ -720,7 +726,13 @@ version(USE_SQLITE) {
             } else if (res == SQLITE_ROW) {
                 //writeln("sqlite3_step = SQLITE_ROW");
                 // have a row
-                currentRowIndex++;
+				if (started)
+					currentRowIndex++;
+				else
+				{
+					started = true;
+					currentRowIndex = 0;
+				}
                 columnCount = sqlite3_data_count(rs);
                 return true;
             } else {
@@ -729,38 +741,38 @@ version(USE_SQLITE) {
             }
         }
         
-        override int findColumn(string columnName) {
+        override size_t findColumn(string columnName) {
             checkClosed();
             lock();
             scope(exit) unlock();
-            int * p = (columnName in columnMap);
+            size_t * p = (columnName in columnMap);
             if (!p)
                 throw new SQLException("Column " ~ columnName ~ " not found");
             return *p + 1;
         }
         
-        override bool getBoolean(int columnIndex) {
+        override bool getBoolean(size_t columnIndex) {
             return getLong(columnIndex) != 0;
         }
-        override ubyte getUbyte(int columnIndex) {
+        override ubyte getUbyte(size_t columnIndex) {
             return cast(ubyte)getLong(columnIndex);
         }
-        override byte getByte(int columnIndex) {
+        override byte getByte(size_t columnIndex) {
             return cast(byte)getLong(columnIndex);
         }
-        override short getShort(int columnIndex) {
+        override short getShort(size_t columnIndex) {
             return cast(short)getLong(columnIndex);
         }
-        override ushort getUshort(int columnIndex) {
+        override ushort getUshort(size_t columnIndex) {
             return cast(ushort)getLong(columnIndex);
         }
-        override int getInt(int columnIndex) {
+        override int getInt(size_t columnIndex) {
             return cast(int)getLong(columnIndex);
         }
-        override uint getUint(int columnIndex) {
+        override uint getUint(size_t columnIndex) {
             return cast(uint)getLong(columnIndex);
         }
-        override long getLong(int columnIndex) {
+        override long getLong(size_t columnIndex) {
             checkClosed();
             checkIndex(columnIndex);
             lock();
@@ -768,10 +780,10 @@ version(USE_SQLITE) {
             auto v = sqlite3_column_int64(rs, columnIndex - 1);
             return v;
         }
-        override ulong getUlong(int columnIndex) {
+        override ulong getUlong(size_t columnIndex) {
             return cast(ulong)getLong(columnIndex);
         }
-        override double getDouble(int columnIndex) {
+        override double getDouble(size_t columnIndex) {
             checkClosed();
             checkIndex(columnIndex);
             lock();
@@ -779,10 +791,10 @@ version(USE_SQLITE) {
             auto v = sqlite3_column_double(rs, columnIndex - 1);
             return v;
         }
-        override float getFloat(int columnIndex) {
+        override float getFloat(size_t columnIndex) {
             return cast(float)getDouble(columnIndex);
         }
-        override byte[] getBytes(int columnIndex) {
+        override byte[] getBytes(size_t columnIndex) {
             checkClosed();
             checkIndex(columnIndex);
             lock();
@@ -794,7 +806,7 @@ version(USE_SQLITE) {
                 res[i] = bytes[i];
             return res;
         }
-        override ubyte[] getUbytes(int columnIndex) {
+        override ubyte[] getUbytes(size_t columnIndex) {
             checkClosed();
             checkIndex(columnIndex);
             lock();
@@ -806,7 +818,7 @@ version(USE_SQLITE) {
                 res[i] = bytes[i];
             return res;
         }
-        override string getString(int columnIndex) {
+        override string getString(size_t columnIndex) {
             checkClosed();
             checkIndex(columnIndex);
             lock();
@@ -818,7 +830,7 @@ version(USE_SQLITE) {
                 res[i] = bytes[i];
             return cast(string)res;
         }
-        override DateTime getDateTime(int columnIndex) {
+        override DateTime getDateTime(size_t columnIndex) {
             string s = getString(columnIndex);
             DateTime dt;
             if (s is null)
@@ -829,7 +841,7 @@ version(USE_SQLITE) {
                 throw new SQLException("Cannot convert string to DateTime - " ~ s);
             }
         }
-        override Date getDate(int columnIndex) {
+        override Date getDate(size_t columnIndex) {
             string s = getString(columnIndex);
             Date dt;
             if (s is null)
@@ -840,7 +852,7 @@ version(USE_SQLITE) {
                 throw new SQLException("Cannot convert string to DateTime - " ~ s);
             }
         }
-        override TimeOfDay getTime(int columnIndex) {
+        override TimeOfDay getTime(size_t columnIndex) {
             string s = getString(columnIndex);
             TimeOfDay dt;
             if (s is null)
@@ -852,7 +864,7 @@ version(USE_SQLITE) {
             }
         }
         
-        override Variant getVariant(int columnIndex) {
+        override Variant getVariant(size_t columnIndex) {
             checkClosed();
             int type = checkIndex(columnIndex);
             lock();
@@ -884,7 +896,7 @@ version(USE_SQLITE) {
             scope(exit) unlock();
             return lastIsNull;
         }
-        override bool isNull(int columnIndex) {
+        override bool isNull(size_t columnIndex) {
             checkClosed();
             lock();
             scope(exit) unlock();
@@ -901,21 +913,18 @@ version(USE_SQLITE) {
         }
         
         //Retrieves the current row number
-        override int getRow() {
+        override size_t getRow() {
             checkClosed();
             lock();
             scope(exit) unlock();
-            if (currentRowIndex <0)
+            if (!started)
                 return 0;
             return currentRowIndex + 1;
         }
         
         //Retrieves the fetch size for this ResultSet object.
-        override int getFetchSize() {
-            checkClosed();
-            lock();
-            scope(exit) unlock();
-            return -1;
+        override size_t getFetchSize() {
+            throw new SQLException("Cannot get fetch size on SQLite databases.");
         }
     }
 

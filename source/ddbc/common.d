@@ -187,94 +187,94 @@ public:
         throw new SQLException("Method not implemented");
     }
     
-    override int findColumn(string columnName) {
+    override size_t findColumn(string columnName) {
         throw new SQLException("Method not implemented");
     }
-    override bool getBoolean(int columnIndex) {
+    override bool getBoolean(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override bool getBoolean(string columnName) {
         return getBoolean(findColumn(columnName));
     }
-    override ubyte getUbyte(int columnIndex) {
+    override ubyte getUbyte(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override ubyte getUbyte(string columnName) {
         return getUbyte(findColumn(columnName));
     }
-    override byte getByte(int columnIndex) {
+    override byte getByte(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override byte getByte(string columnName) {
         return getByte(findColumn(columnName));
     }
-    override byte[] getBytes(int columnIndex) {
+    override byte[] getBytes(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override byte[] getBytes(string columnName) {
         return getBytes(findColumn(columnName));
     }
-    override ubyte[] getUbytes(int columnIndex) {
+    override ubyte[] getUbytes(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override ubyte[] getUbytes(string columnName) {
         return getUbytes(findColumn(columnName));
     }
-    override short getShort(int columnIndex) {
+    override short getShort(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override short getShort(string columnName) {
         return getShort(findColumn(columnName));
     }
-    override ushort getUshort(int columnIndex) {
+    override ushort getUshort(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override ushort getUshort(string columnName) {
         return getUshort(findColumn(columnName));
     }
-    override int getInt(int columnIndex) {
+    override int getInt(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override int getInt(string columnName) {
         return getInt(findColumn(columnName));
     }
-    override uint getUint(int columnIndex) {
+    override uint getUint(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override uint getUint(string columnName) {
         return getUint(findColumn(columnName));
     }
-    override long getLong(int columnIndex) {
+    override long getLong(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override long getLong(string columnName) {
         return getLong(findColumn(columnName));
     }
-    override ulong getUlong(int columnIndex) {
+    override ulong getUlong(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override ulong getUlong(string columnName) {
         return getUlong(findColumn(columnName));
     }
-    override double getDouble(int columnIndex) {
+    override double getDouble(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override double getDouble(string columnName) {
         return getDouble(findColumn(columnName));
     }
-    override float getFloat(int columnIndex) {
+    override float getFloat(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override float getFloat(string columnName) {
         return getFloat(findColumn(columnName));
     }
-    override string getString(int columnIndex) {
+    override string getString(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override string getString(string columnName) {
         return getString(findColumn(columnName));
     }
-    override Variant getVariant(int columnIndex) {
+    override Variant getVariant(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
     override Variant getVariant(string columnName) {
@@ -285,7 +285,7 @@ public:
         throw new SQLException("Method not implemented");
     }
 
-    override bool isNull(int columnIndex) {
+    override bool isNull(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
 
@@ -298,20 +298,20 @@ public:
         throw new SQLException("Method not implemented");
     }
     //Retrieves the current row number
-    override int getRow() {
+    override size_t getRow() {
         throw new SQLException("Method not implemented");
     }
     //Retrieves the fetch size for this ResultSet object.
-    override int getFetchSize() {
+    override size_t getFetchSize() {
         throw new SQLException("Method not implemented");
     }
-    override std.datetime.DateTime getDateTime(int columnIndex) {
+    override std.datetime.DateTime getDateTime(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
-    override std.datetime.Date getDate(int columnIndex) {
+    override std.datetime.Date getDate(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
-    override std.datetime.TimeOfDay getTime(int columnIndex) {
+    override std.datetime.TimeOfDay getTime(size_t columnIndex) {
         throw new SQLException("Method not implemented");
     }
 }
@@ -360,30 +360,30 @@ class ParameterMetaDataImpl : ParameterMetaData {
     this(ParameterMetaDataItem [] cols) {
         this.cols = cols;
     }
-    ref ParameterMetaDataItem col(int column) {
+    ref ParameterMetaDataItem col(size_t column) {
         enforceEx!SQLException(column >=1 && column <= cols.length, "Parameter index out of range");
         return cols[column - 1];
     }
     // Retrieves the fully-qualified name of the Java class whose instances should be passed to the method PreparedStatement.setObject.
     //String getParameterClassName(int param);
     /// Retrieves the number of parameters in the PreparedStatement object for which this ParameterMetaData object contains information.
-    int getParameterCount() {
-        return cast(int)cols.length;
+    size_t getParameterCount() {
+        return cols.length;
     }
     /// Retrieves the designated parameter's mode.
-    int getParameterMode(int param) { return col(param).mode; }
+    int getParameterMode(size_t param) { return col(param).mode; }
     /// Retrieves the designated parameter's SQL type.
-    int getParameterType(int param) { return col(param).type; }
+    int getParameterType(size_t param) { return col(param).type; }
     /// Retrieves the designated parameter's database-specific type name.
-    string getParameterTypeName(int param) { return col(param).typeName; }
+    string getParameterTypeName(size_t param) { return col(param).typeName; }
     /// Retrieves the designated parameter's number of decimal digits.
-    int getPrecision(int param) { return col(param).precision; }
+    int getPrecision(size_t param) { return col(param).precision; }
     /// Retrieves the designated parameter's number of digits to right of the decimal point.
-    int getScale(int param) { return col(param).scale; }
+    int getScale(size_t param) { return col(param).scale; }
     /// Retrieves whether null values are allowed in the designated parameter.
-    int isNullable(int param) { return col(param).isNullable; }
+    int isNullable(size_t param) { return col(param).isNullable; }
     /// Retrieves whether values for the designated parameter can be signed numbers.
-    bool isSigned(int param) { return col(param).isSigned; }
+    bool isSigned(size_t param) { return col(param).isSigned; }
 }
 
 class ResultSetMetaDataImpl : ResultSetMetaData {
@@ -391,52 +391,52 @@ class ResultSetMetaDataImpl : ResultSetMetaData {
     this(ColumnMetadataItem [] cols) {
         this.cols = cols;
     }
-    ref ColumnMetadataItem col(int column) {
+    ref ColumnMetadataItem col(size_t column) {
         enforceEx!SQLException(column >=1 && column <= cols.length, "Column index out of range");
         return cols[column - 1];
     }
     //Returns the number of columns in this ResultSet object.
-    override int getColumnCount() { return cast(int)cols.length; }
+    override size_t getColumnCount() { return cols.length; }
     // Gets the designated column's table's catalog name.
-    override string getCatalogName(int column) { return col(column).catalogName; }
+    override string getCatalogName(size_t column) { return col(column).catalogName; }
     // Returns the fully-qualified name of the Java class whose instances are manufactured if the method ResultSet.getObject is called to retrieve a value from the column.
-    //override string getColumnClassName(int column) { return col(column).catalogName; }
+    //override string getColumnClassName(size_t column) { return col(column).catalogName; }
     // Indicates the designated column's normal maximum width in characters.
-    override int getColumnDisplaySize(int column) { return col(column).displaySize; }
+    override int getColumnDisplaySize(size_t column) { return col(column).displaySize; }
     // Gets the designated column's suggested title for use in printouts and displays.
-    override string getColumnLabel(int column) { return col(column).label; }
+    override string getColumnLabel(size_t column) { return col(column).label; }
     // Get the designated column's name.
-    override string getColumnName(int column) { return col(column).name; }
+    override string getColumnName(size_t column) { return col(column).name; }
     // Retrieves the designated column's SQL type.
-    override int getColumnType(int column) { return col(column).type; }
+    override int getColumnType(size_t column) { return col(column).type; }
     // Retrieves the designated column's database-specific type name.
-    override string getColumnTypeName(int column) { return col(column).typeName; }
+    override string getColumnTypeName(size_t column) { return col(column).typeName; }
     // Get the designated column's number of decimal digits.
-    override int getPrecision(int column) { return col(column).precision; }
+    override int getPrecision(size_t column) { return col(column).precision; }
     // Gets the designated column's number of digits to right of the decimal point.
-    override int getScale(int column) { return col(column).scale; }
+    override int getScale(size_t column) { return col(column).scale; }
     // Get the designated column's table's schema.
-    override string getSchemaName(int column) { return col(column).schemaName; }
+    override string getSchemaName(size_t column) { return col(column).schemaName; }
     // Gets the designated column's table name.
-    override string getTableName(int column) { return col(column).tableName; }
+    override string getTableName(size_t column) { return col(column).tableName; }
     // Indicates whether the designated column is automatically numbered, thus read-only.
-    override bool isAutoIncrement(int column) { return col(column).isAutoIncrement; }
+    override bool isAutoIncrement(size_t column) { return col(column).isAutoIncrement; }
     // Indicates whether a column's case matters.
-    override bool isCaseSensitive(int column) { return col(column).isCaseSensitive; }
+    override bool isCaseSensitive(size_t column) { return col(column).isCaseSensitive; }
     // Indicates whether the designated column is a cash value.
-    override bool isCurrency(int column) { return col(column).isCurrency; }
+    override bool isCurrency(size_t column) { return col(column).isCurrency; }
     // Indicates whether a write on the designated column will definitely succeed.
-    override bool isDefinitelyWritable(int column) { return col(column).isDefinitelyWritable; }
+    override bool isDefinitelyWritable(size_t column) { return col(column).isDefinitelyWritable; }
     // Indicates the nullability of values in the designated column.
-    override int isNullable(int column) { return col(column).isNullable; }
+    override int isNullable(size_t column) { return col(column).isNullable; }
     // Indicates whether the designated column is definitely not writable.
-    override bool isReadOnly(int column) { return col(column).isReadOnly; }
+    override bool isReadOnly(size_t column) { return col(column).isReadOnly; }
     // Indicates whether the designated column can be used in a where clause.
-    override bool isSearchable(int column) { return col(column).isSearchable; }
+    override bool isSearchable(size_t column) { return col(column).isSearchable; }
     // Indicates whether values in the designated column are signed numbers.
-    override bool isSigned(int column) { return col(column).isSigned; }
+    override bool isSigned(size_t column) { return col(column).isSigned; }
     // Indicates whether it is possible for a write on the designated column to succeed.
-    override bool isWritable(int column) { return col(column).isWritable; }
+    override bool isWritable(size_t column) { return col(column).isWritable; }
 }
 
 version (unittest) {
